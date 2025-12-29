@@ -40,6 +40,7 @@ function createRegistoryFile(skinmap_hex_array) {
 
 [HKEY_CURRENT_USER\\Software\\Pixel Gun Team\\Pixel Gun 3D]
 "User Skins_h1196497400"=hex:${skinmap_hex_array}`;
+  // URL作成
   const blob = new Blob([regText], { type: "text/plain" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -58,9 +59,11 @@ document.getElementById("btn").onclick = async () => {
 
   // 画像とsnowflakeIDを生成、紐づけ
   for (let data of file_datas) {
-    const base64 = await getImageBase64(data);
+    const raw_base64 = await getImageBase64(data);
+    // 画像加工処理を通す
+    const modify_base64 = await processSkin(raw_base64);
     const id = generateSnowflakeId();
-    skinmap[id] = base64;
+    skinmap[id] = modify_base64;
   }
   // 辞書オブジェクトをhex配列へと変換
   const skinmap_hex_array = objToHexArray(skinmap);
