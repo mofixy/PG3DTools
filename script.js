@@ -1,51 +1,70 @@
-document.getElementById("btn").onclick = () => {
-  const input = document.getElementById("imgInput");
-  const file = input.files[0];
-  if (!file) return;
+// ファイルの取得とbase64の抽出
+function getImageBase64(image) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(image);
+    reader.onload = () => {
+      resolve(reader.result.split(",")[1]);
+    };
+  });
+}
 
-  const reader = new FileReader();
+// snowflakeIDの生成
+// まともに生成はめんどくさいのでlong値からデクリメント
+let current_id = 9223372036854775807n;
+function generateSnowflakeId() {
+  const id = current_id;
+  current_id -= 1n;
+  return id.toString();
+}
 
-  reader.onload = () => {
-    // 1. base64生データ取得
-    const dataUrl = reader.result;
-    const base64 = dataUrl.split(",")[1];
+//object -> string -> utf-8 -> hex
+function objToHexArray(skinmap) {
+  const encoder = new TextEncoder();
 
-    // 2. JSONオブジェクト作成
-    const snowflakeId = "9223372036854775807";
-    const obj = {};
-    obj[snowflakeId] = base64;
+  const skinmap_str = JSON.stringify(skinmap);
+  const skinmap_utf8 = encoder.encode(skinmap_str);
+  const skinmap_hex = [];
+  for (let b of skinmap_utf8) {
+    skinmap_hex.push(b.toString(16).padStart(2, "0"));
+  }
+  // レジストリ用のnull終端
+  skinmap_hex.push("00");
+  const result = skinmap_hex.join(",");
+  return result;
+}
 
-    // 3. JSON文字列化
-    const jsonStr = JSON.stringify(obj);
-
-    // 4. JSON文字列 → UTF-8 → hex(カンマ区切り)
-    const encoder = new TextEncoder();
-    const bytes = encoder.encode(jsonStr);
-
-    const hexArray = [];
-    for (const b of bytes) {
-      hexArray.push(b.toString(16).padStart(2, "0"));
-    }
-    hexArray.push("00");
-
-    const hexStr = hexArray.join(",");
-
-    // 5. 出力
-    const regText = `Windows Registry Editor Version 5.00
+// .regファイルの出力
+function createRegistoryFile(skinmap_hex_array) {
+  const regText = `Windows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\\Software\\Pixel Gun Team\\Pixel Gun 3D]
-"User Skins_h1196497400"=hex:${hexStr}`;
+"User Skins_h1196497400"=hex:${skinmap_hex_array}`;
+  const blob = new Blob([regText], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "skin.reg";
+  a.click();
 
-    const blob = new Blob([regText], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
+  URL.revokeObjectURL(url);
+}
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "skin.reg";
-    a.click();
+// メイン処理
+document.getElementById("btn").onclick = async () => {
+  const input_image = document.getElementById("imgInput");
+  const file_datas = input_image.files;
+  const skinmap = {};
 
-    URL.revokeObjectURL(url);
-  };
+  // 画像とsnowflakeIDを生成、紐づけ
+  for (let data of file_datas) {
+    const base64 = await getImageBase64(data);
+    const id = generateSnowflakeId();
+    skinmap[id] = base64;
+  }
+  // 辞書オブジェクトをhex配列へと変換
+  const skinmap_hex_array = objToHexArray(skinmap);
 
-  reader.readAsDataURL(file);
+  // .regに詰めて出力
+  createRegistoryFile(skinmap_hex_array);
 };
