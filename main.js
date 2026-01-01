@@ -69,7 +69,7 @@ function getOptions() {
       "skip_seccond_layer_ovarlay_body"
     ).checked,
     skipSeccondLayerOverLayArm: document.getElementById(
-      "skip_seccond_layer_ovarlay_head"
+      "skip_seccond_layer_ovarlay_arm"
     ).checked,
     skipSeccondLayerOverLayLeg: document.getElementById(
       "skip_seccond_layer_ovarlay_leg"
