@@ -10,6 +10,73 @@
 
   <body>
     <input type="file" id="imgInput" accept="image/*" multiple />
+    <br />
     <button id="btn">生成</button>
+    <br />
+
+    <image_process>
+      <dl>
+        <dt>
+          <label>
+            <input type="checkbox" id="use_process_skin" checked />
+            スキンの自動加工
+          </label>
+        </dt>
+        <dd>
+          <label>
+            <input type="checkbox" id="use_flip_arm_top" checked />
+            腕のtop面をX軸で反転
+          </label>
+          <br />
+          <label>
+            <input
+              type="checkbox"
+              id="use_seccond_layer_eyeline_remove"
+              checked
+            />
+            レイヤー内のアイラインが上書きされるドットを削除
+          </label>
+          <dl>
+            <dt>
+              <label>
+                <input type="checkbox" id="skip_seccond_layer_ovarlay_all" />
+                すべてのレイヤーテクスチャの上書きをスキップ
+              </label>
+            </dt>
+            <dd>
+              <label>
+                <input type="checkbox" id="skip_seccond_layer_ovarlay_head" />
+                頭のレイヤーの上書きをスキップ
+              </label>
+              <br />
+              <label>
+                <input type="checkbox" id="skip_seccond_layer_ovarlay_body" />
+                胴体のレイヤーの上書きをスキップ
+              </label>
+              <br />
+              <label>
+                <input type="checkbox" id="skip_seccond_layer_ovarlay_arm" />
+                腕のレイヤーの上書きをスキップ
+              </label>
+              <br />
+              <label>
+                <input type="checkbox" id="skip_seccond_layer_ovarlay_leg" />
+                足のレイヤーの上書きをスキップ
+              </label>
+              <br />
+            </dd>
+          </dl>
+        </dd>
+      </dl>
+      使用するテクスチャ: (未使用)
+      <select id="texture_side_arm">
+        <option value="right">右腕</option>
+        <option value="left">左腕</option>
+      </select>
+      <select id="texture_side_leg">
+        <option value="right">右足</option>
+        <option value="left">左足</option>
+      </select>
+    </image_process>
   </body>
 </html>

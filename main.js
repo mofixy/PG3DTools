@@ -51,20 +51,54 @@ function createRegistoryFile(skinmap_hex_array) {
   URL.revokeObjectURL(url);
 }
 
+// オプションの値
+function getOptions() {
+  return {
+    useProcessSkin: document.getElementById("use_process_skin").checked,
+    useFlipArmTop: document.getElementById("use_flip_arm_top").checked,
+    useSeccondLayerEyelineRemove: document.getElementById(
+      "use_seccond_layer_eyeline_remove"
+    ).checked,
+    // レイヤー上書きスキップ
+    skipSeccondLayerOverLayAll: document.getElementById(
+      "skip_seccond_layer_ovarlay_all"
+    ).checked,
+    skipSeccondLayerOverLayHead: document.getElementById(
+      "skip_seccond_layer_ovarlay_head"
+    ).checked,
+    skipSeccondLayerOverLayBody: document.getElementById(
+      "skip_seccond_layer_ovarlay_body"
+    ).checked,
+    skipSeccondLayerOverLayArm: document.getElementById(
+      "skip_seccond_layer_ovarlay_head"
+    ).checked,
+    skipSeccondLayerOverLayLeg: document.getElementById(
+      "skip_seccond_layer_ovarlay_leg"
+    ).checked,
+    // 腕、足の使用テクスチャ
+    textureSideArm: document.getElementById("texture_side_arm").value,
+    textureSideLeg: document.getElementById("texture_side_leg").value,
+  };
+}
+
 // メイン処理
 document.getElementById("btn").onclick = async () => {
   const input_image = document.getElementById("imgInput");
   const file_datas = input_image.files;
   const skinmap = {};
+  const option = getOptions();
 
   // 画像とsnowflakeIDを生成、紐づけ
   for (let data of file_datas) {
     const raw_base64 = await getImageBase64(data);
+
     // 画像加工処理を通す
-    const modify_base64 = await processSkin(raw_base64);
+    // todo: スキンサイズが64x64だとまずいのでどうにかする。
+    const modify_base64 = await processSkin(raw_base64, option);
     const id = generateSnowflakeId();
     skinmap[id] = modify_base64;
   }
+
   // 辞書オブジェクトをhex配列へと変換
   const skinmap_hex_array = objToHexArray(skinmap);
 
